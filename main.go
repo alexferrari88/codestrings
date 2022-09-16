@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"strings"
 	"sync"
 )
 
@@ -44,13 +46,21 @@ func ExtractStrings(source string, stringDelimiters []string) []string {
 
 func main() {
 
+	output := flag.String("output", "csv", "Output type: json, csv")
 	flag.Parse()
 	filesArg := flag.Args()
 	if len(filesArg) == 0 {
 		panic("No files specified")
 	}
 
+	type Result struct {
+		File   string   `json:"file"`
+		Data   []string `json:"data"`
+		Output string   `json:"-"` // This field will not be marshalled
+	}
+
 	var wg sync.WaitGroup
+	results := make(chan Result, len(filesArg))
 
 	for _, file := range filesArg {
 		wg.Add(1)
@@ -66,9 +76,30 @@ func main() {
 			if err != nil {
 				panic(err.Error())
 			}
-			fmt.Printf("%q\n", ExtractStrings(string(raw), []string{"\"", "'", "`"}))
+			results <- Result{
+				File:   file,
+				Data:   ExtractStrings(string(raw), []string{"\"", "'", "`"}),
+				Output: *output,
+			}
 		}(file)
 	}
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
 
-	wg.Wait()
+	for result := range results {
+		switch result.Output {
+		case "json":
+			j, err := json.Marshal(result)
+			if err != nil {
+				continue
+			}
+			fmt.Println(string(j))
+		case "csv":
+			fmt.Printf("%s,%s\n", result.File, strings.Join(result.Data, ","))
+		default:
+			panic("Unknown output format")
+		}
+	}
 }
