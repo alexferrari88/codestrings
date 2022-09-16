@@ -4,22 +4,27 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"sync"
 )
 
-func main() {
-	filePath := flag.String("file", "", "File path")
-	flag.Parse()
-
-	raw, err := ioutil.ReadFile(*filePath)
-	if err != nil {
-		panic(err.Error())
+func populateMap(m map[string]struct{}, s []string) {
+	for _, v := range s {
+		m[v] = struct{}{}
 	}
+}
+
+func ExtractStrings(source string, stringDelimiters []string) []string {
 	var strings []string
 	var started bool
 	var currentString string
-	for i := range raw {
-		c := raw[i]
-		if c == '`' || c == '"' || c == '\'' {
+	if len(stringDelimiters) == 0 {
+		stringDelimiters = []string{"\"", "'"}
+	}
+	symbolsMap := make(map[string]struct{}, len(stringDelimiters))
+	populateMap(symbolsMap, stringDelimiters)
+	for i := range source {
+		c := source[i]
+		if _, ok := symbolsMap[string(c)]; ok {
 			if started {
 				strings = append(strings, currentString)
 				started = false
@@ -34,5 +39,36 @@ func main() {
 			currentString += string(c)
 		}
 	}
-	fmt.Println(strings)
+	return strings
+}
+
+func main() {
+
+	flag.Parse()
+	filesArg := flag.Args()
+	if len(filesArg) == 0 {
+		panic("No files specified")
+	}
+
+	var wg sync.WaitGroup
+
+	for _, file := range filesArg {
+		wg.Add(1)
+		go func(file string) {
+			defer wg.Done()
+			defer func() {
+				if err := recover(); err != nil {
+					fmt.Printf("Error processing file %s: %v", file, err)
+				}
+			}()
+
+			raw, err := ioutil.ReadFile(file)
+			if err != nil {
+				panic(err.Error())
+			}
+			fmt.Printf("%q\n", ExtractStrings(string(raw), []string{"\"", "'", "`"}))
+		}(file)
+	}
+
+	wg.Wait()
 }
