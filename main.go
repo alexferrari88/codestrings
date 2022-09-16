@@ -8,6 +8,11 @@ func populateMap(m map[string]struct{}, s []string) {
 	}
 }
 
+// ExtractStrings extracts all strings from a source code
+// stringDelimiters is a list of delimiters that can be used to start and end a string
+// For instance, in JavaScript, strings can be delimited by " or ', e.g. "hello" or 'world'
+// If stringDelimiters is empty, it will use the default ones: " and '
+// It will ignore escaped strings and unterminated strings
 func ExtractStrings(source string, stringDelimiters []string) []string {
 	var stringsList []string
 	var started bool
