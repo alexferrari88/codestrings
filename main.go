@@ -27,7 +27,9 @@ func ExtractStrings(source string, stringDelimiters []string) []string {
 				started = false
 				currentString = ""
 				continue
-			} else {
+			} else if !started && i > 0 && source[i-1] == '\\' { // ignore escaped strings
+				continue
+			} else if !started && i != len(source)-1 { // ignore unterminated strings
 				started = true
 				continue
 			}
