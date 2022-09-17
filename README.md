@@ -61,7 +61,7 @@ codestrings example.js
 The output will be:
 
 ```bash
-example.js,Hello ${name},John,Doe,123 Main St,New York,NY
+example.js,"Hello ${name}","John","Doe","123 Main St","New York","NY"
 ```
 
 ## Roadmap 🛣️
