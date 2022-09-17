@@ -28,11 +28,14 @@ func ExtractStrings(source string, stringDelimiters []string) []string {
 	for i := range source {
 		c := source[i]
 		if _, ok := symbolsMap[string(c)]; ok {
-			if started && strings.TrimSpace(currentString) != "" {
+			if started {
 				if c == delimiter && source[i-1] != '\\' {
-					// we found the end of a string and it's not empty
+					// found the end of a string
 					// source[i-1] != '\\' means that the delimiter is not escaped so it's an actual string delimiter
-					stringsList = append(stringsList, currentString)
+					if strings.TrimSpace(currentString) != "" {
+						// only add the string if it's not empty
+						stringsList = append(stringsList, currentString)
+					}
 					started = false
 					currentString = ""
 					delimiter = 0

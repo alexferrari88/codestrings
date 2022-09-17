@@ -9,8 +9,8 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${workspaceFolder}",
-      "args": ["main.js"]
+      "program": "${workspaceFolder}/cmd",
+      "args": ["../test/main1.js"]
     }
   ]
 }

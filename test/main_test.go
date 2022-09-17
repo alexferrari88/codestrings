@@ -143,10 +143,10 @@ func TestExtractStrings(t *testing.T) {
 		{
 			name: "string in the middle of an expression with white space",
 			args: args{
-				source:           `const d = a + " " + b + c;`,
+				source:           `const d = a + " " + b + "hello" + name;`,
 				stringDelimiters: []string{"\""},
 			},
-			want: []string{},
+			want: []string{"hello"},
 		},
 	}
 	for _, tt := range tests {
