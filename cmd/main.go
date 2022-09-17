@@ -69,7 +69,12 @@ func main() {
 			}
 			fmt.Println(string(j))
 		case "csv":
-			fmt.Printf("%s,%s\n", result.File, strings.Join(result.Data, ","))
+			for i := range result.Data {
+				result.Data[i] = strings.Replace(result.Data[i], "\"", "\"\"", -1)
+				result.Data[i] = fmt.Sprintf("\"%s\"", result.Data[i])
+			}
+			csvData := strings.Join(result.Data, ",")
+			fmt.Printf("%s,%s\n", result.File, csvData)
 		default:
 			continue
 		}
