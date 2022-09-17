@@ -108,6 +108,46 @@ func TestExtractStrings(t *testing.T) {
 			},
 			want: []string{"hello", "world", "it\\\\'s a beautiful day", "it's a beautiful day"},
 		},
+		{
+			name: "strings in an expression",
+			args: args{
+				source:           `var a = "hello" + "world"`,
+				stringDelimiters: []string{"\""},
+			},
+			want: []string{"hello", "world"},
+		},
+		{
+			name: "strings in an expression searching for double and single quotes",
+			args: args{
+				source:           `var a = "hello" + "world" + "it's a beautiful day"`,
+				stringDelimiters: []string{"\"", "'"},
+			},
+			want: []string{"hello", "world", "it's a beautiful day"},
+		},
+		{
+			name: "strings in an expression with mixed quotes",
+			args: args{
+				source:           `var a = "hello" + 'world' + "it's a beautiful day"`,
+				stringDelimiters: []string{"\"", "'"},
+			},
+			want: []string{"hello", "world", "it's a beautiful day"},
+		},
+		{
+			name: "strings in an expression with escaped quotes",
+			args: args{
+				source:           `var a = "hello" + "world" + 'it\'s a beautiful day'`,
+				stringDelimiters: []string{"\"", "'"},
+			},
+			want: []string{"hello", "world", "it\\'s a beautiful day"},
+		},
+		{
+			name: "string in the middle of an expression with white space",
+			args: args{
+				source:           `const d = a + " " + b + c;`,
+				stringDelimiters: []string{"\""},
+			},
+			want: []string{},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
