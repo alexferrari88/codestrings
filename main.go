@@ -30,29 +30,29 @@ func ExtractStrings(source string, stringDelimiters []string) []string {
 		if _, ok := symbolsMap[string(c)]; ok {
 			if started {
 				if strings.TrimSpace(currentString) != "" && c == delimiter && source[i-1] != '\\' {
-					// ignore empty strings or being made of only spaces
-					// c == delimiter is to avoid cases like "it's a beautiful day"
+					// we found the end of a string and it's not empty
+					// source[i-1] != '\\' means that the delimiter is not escaped so it's an actual string delimiter
 					stringsList = append(stringsList, currentString)
 					started = false
 					currentString = ""
 					delimiter = 0
 					continue
 				} else if c != delimiter {
-					// c != delimiter is to avoid cases like "it's a beautiful day"
+					// if the delimiter is not the same as the one that started the string, it's not a string delimiter
+					// e.g. var a = "it's a beautiful day"
 					currentString += string(c)
 					continue
 				}
-			} else if !started && i > 0 && source[i-1] == '\\' {
-				// ignore escaped strings
-				continue
 			} else if !started && i != len(source)-1 {
-				// ignore unterminated strings
+				// we found the start of a string
+				// we also check that the string delimiter is not at the end of the source code
+				// so we ignore unterminated strings
 				started = true
 				delimiter = c
 				continue
 			}
 		}
-		if started && c != '\\' && i != len(source)-1 {
+		if started && i != len(source)-1 {
 			currentString += string(c)
 		}
 	}

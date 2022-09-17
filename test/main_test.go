@@ -74,7 +74,7 @@ func TestExtractStrings(t *testing.T) {
 				source:           `var a = "hello"; var b = 'world'; var c = "it's a beautiful day"; var d = "it\\'s a beautiful day"`,
 				stringDelimiters: []string{"\"", "'"},
 			},
-			want: []string{"hello", "world", "it's a beautiful day", "it's a beautiful day"},
+			want: []string{"hello", "world", "it's a beautiful day", "it\\\\'s a beautiful day"},
 		},
 		{
 			name: "single string in single quotes",
@@ -98,7 +98,7 @@ func TestExtractStrings(t *testing.T) {
 				source:           `var a = 'hello'; var b = 'world'; var c = 'it\\'s a beautiful day'`,
 				stringDelimiters: []string{"'"},
 			},
-			want: []string{"hello", "world", "it's a beautiful day"},
+			want: []string{"hello", "world", "it\\\\'s a beautiful day"},
 		},
 		{
 			name: "multiple strings in either single or double quotes",
@@ -106,7 +106,7 @@ func TestExtractStrings(t *testing.T) {
 				source:           `var a = 'hello'; var b = "world"; var c = 'it\\'s a beautiful day'; var d = "it's a beautiful day"`,
 				stringDelimiters: []string{"'", "\""},
 			},
-			want: []string{"hello", "world", "it's a beautiful day", "it's a beautiful day"},
+			want: []string{"hello", "world", "it\\\\'s a beautiful day", "it's a beautiful day"},
 		},
 	}
 	for _, tt := range tests {
