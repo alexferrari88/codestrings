@@ -1,6 +1,7 @@
 ﻿package codestrings_test
 
 import (
+	"io/ioutil"
 	"testing"
 
 	cs "github.com/alexferrari88/codestrings"
@@ -155,5 +156,17 @@ func TestExtractStrings(t *testing.T) {
 				t.Errorf("ExtractStrings() = %q, want %q", got, tt.want)
 			}
 		})
+	}
+}
+
+func BenchmarkExtractStrings(b *testing.B) {
+	// load example.js
+	source, err := ioutil.ReadFile("example.js")
+	if err != nil {
+		b.Fatal(err)
+	}
+	delimiters := []string{"\"", "'", "`"}
+	for i := 0; i < b.N; i++ {
+		cs.ExtractStrings(string(source), delimiters)
 	}
 }
