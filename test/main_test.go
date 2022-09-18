@@ -2,6 +2,7 @@
 
 import (
 	"io/ioutil"
+	"log"
 	"testing"
 
 	cs "github.com/alexferrari88/codestrings"
@@ -152,6 +153,7 @@ func TestExtractStrings(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			log.Println(tt.name)
 			if got := cs.ExtractStrings(tt.args.source, tt.args.stringDelimiters); !equal(got, tt.want) {
 				t.Errorf("ExtractStrings() = %q, want %q", got, tt.want)
 			}
